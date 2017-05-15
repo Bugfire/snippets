@@ -22,6 +22,11 @@ namespace RayStorm
 
 		#endregion
 
+		const int LOG_MAX = 60;
+		int[] _wofLog = new int[LOG_MAX];
+		int[] _fendLog = new int[LOG_MAX];
+		int _curLog = 0;
+
 		#region Unity Messages
 
 		void Awake ()
@@ -33,7 +38,7 @@ namespace RayStorm
 		void Update ()
 		{
 			const int barWidth = 320;
-			const int barHeight = 32;
+			const int barHeight = 16;
 			const int lineWidth = 2;
 			var ticks = _Profiler.LastTicks;
 
@@ -52,6 +57,11 @@ namespace RayStorm
 			_Canvas.FillRect (lineWidth, sy, barWidth - lineWidth, ey, Color.black);
 			var pos = lineWidth;
 			var ammount = 0;
+
+			_curLog++;
+			if (_curLog >= LOG_MAX) {
+				_curLog = 0;
+			}
 
 			// FixedUpdate
 			ammount = (int)(ticks.FixedUpdate / ticksUnit);
@@ -92,19 +102,28 @@ namespace RayStorm
 			ammount = (int)(ticks.WaitForEndOfFrame / ticksUnit);
 			_Canvas.FillRect (pos, sy, pos + ammount, ey, Color.white);
 			pos += ammount;
+			_wofLog [_curLog] = pos;
 
 			// FrameEnd
 			ammount = (int)(ticks.FrameEnd / ticksUnit);
 			_Canvas.FillRect (pos, sy, pos + ammount, ey, new Color (1, 1, 1, 0.5f));
 			pos += ammount;
+			_fendLog [_curLog] = pos;
+
+			for (var i = 0; i < LOG_MAX; i++) {
+				int index = _curLog - i;
+				if (index < 0) {
+					index += LOG_MAX;
+				}
+				_Canvas.FillRect (0, barHeight + i * 2, _wofLog [index], barHeight + i * 2 + 2, new Color (0.5f, 1, 0.5f, 0.7f));
+				_Canvas.FillRect (_wofLog [index], barHeight + i * 2, _fendLog [index], barHeight + i * 2 + 2, new Color (0.5f, 0.5f, 0.5f, 0.7f));
+			}
 
 			//
 			var fps = Time.unscaledDeltaTime != 0 ? 1 / Time.unscaledDeltaTime : 0;
-			_Canvas.SetTextPosition (0, barHeight);
+			_Canvas.SetTextPosition (8, barHeight);
 			_Canvas.AddText ("FPS:");
 			_Canvas.AddText (fps, 3, 2);
-			_Canvas.AddText (" GC: ");
-			_Canvas.AddText (ticks.GCCount);
 		}
 
 		#endregion

@@ -110,9 +110,6 @@ namespace RayStorm
 
 		void Start ()
 		{
-			// TEST
-			Application.targetFrameRate = 30;
-
 			_lastMarker = Marker.Undefined;
 			_stopwatch = new System.Diagnostics.Stopwatch ();
 			_stopwatch.Start ();

@@ -99,7 +99,7 @@ namespace RayStorm
 			pos += ammount;
 
 			//
-			var fps = Time.deltaTime != 0 ? 1 / Time.deltaTime : 0;
+			var fps = Time.unscaledDeltaTime != 0 ? 1 / Time.unscaledDeltaTime : 0;
 			_Canvas.SetTextPosition (0, barHeight);
 			_Canvas.AddText ("FPS:");
 			_Canvas.AddText (fps, 3, 2);

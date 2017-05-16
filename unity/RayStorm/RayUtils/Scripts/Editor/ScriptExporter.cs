@@ -11,14 +11,15 @@ namespace RayStorm
 
 		#region menu item
 
-		[MenuItem ("Plugin/Management/ExportRayProfiler")]
+		[MenuItem ("Plugins/Management/ExportRayProfiler")]
 		static void ExportRayProfiler ()
 		{
-			string _MyPackage = "Assets/Plugin/RayProfiler.unitypackage";
+			string _AssetBase = "Assets/Plugins/RayStorm";
+			string _MyPackage = _AssetBase + "RayProfiler.unitypackage";
 			string[] _MyAssets = new string[] {
-				"Assets/Plugin/RayCanvas",
-				"Assets/Plugin/RayProfiler",
-				"Assets/Plugin/RayUtils",
+				_AssetBase + "/RayCanvas",
+				_AssetBase + "/RayProfiler",
+				_AssetBase + "/RayUtils",
 			};
 			AssetDatabase.ExportPackage (_MyAssets, _MyPackage, ExportPackageOptions.Recurse);
 		}

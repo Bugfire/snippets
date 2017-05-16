@@ -176,5 +176,6 @@ MonoBehaviour:
   _Font: {fileID: 12800000, guid: 87698b0f74d1442e3af6548940293ad8, type: 2}
   _MeshFilter: {fileID: 33563514985153080}
   _Width: 640
-  _Height: 200
+  _Height: 136
   _MaxRect: 256
+  _ShowMockInEditor: 1

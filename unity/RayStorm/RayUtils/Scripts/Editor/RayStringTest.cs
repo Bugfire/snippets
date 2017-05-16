@@ -2,8 +2,6 @@
 // https://github.com/Bugfire
 
 using UnityEngine;
-using UnityEditor;
-using UnityEngine.TestTools;
 using NUnit.Framework;
 
 namespace RayStorm

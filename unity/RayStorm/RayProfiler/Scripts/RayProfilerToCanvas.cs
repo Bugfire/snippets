@@ -4,6 +4,10 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 
+#if UNITY_5_5_OR_NEWER
+using UnityEngine.Profiling;
+#endif
+
 namespace RayStorm
 {
     #if UNITY_5_5_OR_NEWER
@@ -161,43 +165,30 @@ namespace RayStorm
             _Canvas.AddText (" AVG.FPS:");
             _Canvas.AddText (_lastAvgFPS, 3, 2);
             #if UNITY_5_6_OR_NEWER
-            if (UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong () != 0) {
+            if (UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong () >= 1024) {
                 _Canvas.AddText ("\nVM:   ");
-                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong () / 1024, 6);
+                _Canvas.AddText ((int)Profiler.GetMonoUsedSizeLong () / 1024, 6);
                 _Canvas.AddText ("/");
-                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoHeapSizeLong () / 1024, 6);
+                _Canvas.AddText ((int)Profiler.GetMonoHeapSizeLong () / 1024, 6);
             }
-            if (UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong () != 0) {
+            if (UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong () >= 1024) {
                 _Canvas.AddText ("\nTotal:");
-                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong () / 1024, 6);
+                _Canvas.AddText ((int)Profiler.GetTotalAllocatedMemoryLong () / 1024, 6);
                 _Canvas.AddText ("/");
-                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalReservedMemoryLong () / 1024, 6);
-            }
-            #elif UNITY_5_5_OR_NEWER
-            if (UnityEngine.Profiling.Profiler.GetMonoUsedSize () != 0) {
-                _Canvas.AddText ("\nVM:   ");
-                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoUsedSize () / 1024, 6);
-                _Canvas.AddText ("/");
-                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoHeapSize () / 1024, 6);
-            }
-            if (UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory () != 0) {
-                _Canvas.AddText ("\nTotal:");
-                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory () / 1024, 6);
-                _Canvas.AddText ("/");
-                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalReservedMemory () / 1024, 6);
+                _Canvas.AddText ((int)Profiler.GetTotalReservedMemoryLong () / 1024, 6);
             }
             #else
-            if (UnityEngine.Profiler.GetMonoUsedSize () != 0) {
+            if (Profiler.GetMonoUsedSize () >= 1024) {
                 _Canvas.AddText ("\nVM:   ");
-                _Canvas.AddText ((int)UnityEngine.Profiler.GetMonoUsedSize () / 1024, 6);
+                _Canvas.AddText ((int)Profiler.GetMonoUsedSize () / 1024, 6);
                 _Canvas.AddText ("/");
-                _Canvas.AddText ((int)UnityEngine.Profiler.GetMonoHeapSize () / 1024, 6);
+                _Canvas.AddText ((int)Profiler.GetMonoHeapSize () / 1024, 6);
             }
-            if (UnityEngine.Profiler.GetTotalAllocatedMemory () != 0) {
+            if (Profiler.GetTotalAllocatedMemory () >= 1024) {
                 _Canvas.AddText ("\nTotal:");
-                _Canvas.AddText ((int)UnityEngine.Profiler.GetTotalAllocatedMemory () / 1024, 6);
+                _Canvas.AddText ((int)Profiler.GetTotalAllocatedMemory () / 1024, 6);
                 _Canvas.AddText ("/");
-                _Canvas.AddText ((int)UnityEngine.Profiler.GetTotalReservedMemory () / 1024, 6);
+                _Canvas.AddText ((int)Profiler.GetTotalReservedMemory () / 1024, 6);
             }
             #endif
         }

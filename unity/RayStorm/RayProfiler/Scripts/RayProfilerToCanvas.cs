@@ -6,7 +6,9 @@ using UnityEngine.Assertions;
 
 namespace RayStorm
 {
+    #if UNITY_5_5_OR_NEWER
     [DefaultExecutionOrder (int.MaxValue - 2)]
+    #endif
     sealed public class RayProfilerToCanvas : MonoBehaviour
     {
         #region Inspector Settings Values
@@ -171,7 +173,7 @@ namespace RayStorm
                 _Canvas.AddText ("/");
                 _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalReservedMemoryLong () / 1024, 6);
             }
-            #else
+            #elif UNITY_5_5_OR_NEWER
             if (UnityEngine.Profiling.Profiler.GetMonoUsedSize () != 0) {
                 _Canvas.AddText ("\nVM:   ");
                 _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoUsedSize () / 1024, 6);
@@ -183,6 +185,19 @@ namespace RayStorm
                 _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory () / 1024, 6);
                 _Canvas.AddText ("/");
                 _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalReservedMemory () / 1024, 6);
+            }
+            #else
+            if (UnityEngine.Profiler.GetMonoUsedSize () != 0) {
+                _Canvas.AddText ("\nVM:   ");
+                _Canvas.AddText ((int)UnityEngine.Profiler.GetMonoUsedSize () / 1024, 6);
+                _Canvas.AddText ("/");
+                _Canvas.AddText ((int)UnityEngine.Profiler.GetMonoHeapSize () / 1024, 6);
+            }
+            if (UnityEngine.Profiler.GetTotalAllocatedMemory () != 0) {
+                _Canvas.AddText ("\nTotal:");
+                _Canvas.AddText ((int)UnityEngine.Profiler.GetTotalAllocatedMemory () / 1024, 6);
+                _Canvas.AddText ("/");
+                _Canvas.AddText ((int)UnityEngine.Profiler.GetTotalReservedMemory () / 1024, 6);
             }
             #endif
         }

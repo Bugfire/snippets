@@ -10,7 +10,9 @@ namespace RayStorm
     /// RayCanvas.
     /// For Debug-Use, No dynamic heap allocation, Poor APIs
     /// </summary>
+    #if UNITY_5_5_OR_NEWER
     [DefaultExecutionOrder (int.MaxValue - 1)]
+    #endif
     sealed public class RayCanvas : MonoBehaviour
     {
         #region Inspector Settings Values
@@ -62,10 +64,13 @@ namespace RayStorm
             Setup ();
         }
 
+        #if UNITY_EDITOR
         void OnValidate ()
         {
-            Setup ();
-            if (_ShowMockInEditor) {
+            if (UnityEditor.PrefabUtility.GetPrefabType (gameObject) == UnityEditor.PrefabType.Prefab) {
+                _MeshFilter.mesh = null;
+            } else if (_ShowMockInEditor) {
+                Setup ();
                 FillRect (0, 0, _Width, _Height, new Color (1, 0, 1, 0.5f));
                 SetTextPosition (0, 0);
                 AddText (
@@ -73,9 +78,10 @@ namespace RayStorm
                     " !\"#$%&'()*+,-./0123456789:;<=>?\n" +
                     "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\n" +
                     "`abcdefghijklmnopqrstuvwxyz{|}~\n");
+                Update ();
             }
-            Update ();
         }
+        #endif
 
         void Update ()
         {

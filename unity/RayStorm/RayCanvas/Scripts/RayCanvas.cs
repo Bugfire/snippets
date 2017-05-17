@@ -70,7 +70,6 @@ namespace RayStorm
                 SetTextPosition (0, 0);
                 AddText (
                     "RayCanvas\n" +
-                    "Sample Text!\n" +
                     " !\"#$%&'()*+,-./0123456789:;<=>?\n" +
                     "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\n" +
                     "`abcdefghijklmnopqrstuvwxyz{|}~\n");

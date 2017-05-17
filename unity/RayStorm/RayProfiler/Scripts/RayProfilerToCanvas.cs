@@ -19,10 +19,19 @@ namespace RayStorm
 
         #endregion
 
-        const int LOG_MAX = 60;
-        int[] _wofLog = new int[LOG_MAX];
-        int[] _fendLog = new int[LOG_MAX];
+        struct Log
+        {
+            public int WaitForEndOfFrame;
+            public int FrameEnd;
+            public bool GC;
+        }
+
+        Log[] _Log = new Log[60];
         int _curLog = 0;
+
+        System.Diagnostics.Stopwatch _stopWatch = new System.Diagnostics.Stopwatch ();
+        float _lastAvgFPS = -1;
+        int _lastAvgFPSCounter = 0;
 
         #region Unity Messages
 
@@ -37,6 +46,7 @@ namespace RayStorm
             const int barWidth = 320;
             const int barHeight = 16;
             const int lineWidth = 2;
+
             var ticks = _Profiler.LastTicks;
 
             var targetFps = (int)Application.targetFrameRate;
@@ -58,7 +68,7 @@ namespace RayStorm
             var ammount = 0;
 
             _curLog++;
-            if (_curLog >= LOG_MAX) {
+            if (_curLog >= _Log.Length) {
                 _curLog = 0;
             }
 
@@ -101,36 +111,80 @@ namespace RayStorm
             ammount = (int)(ticks.WaitForEndOfFrame / ticksUnit);
             _Canvas.FillRect (pos, sy, pos + ammount, ey, Color.white);
             pos += ammount;
-            _wofLog [_curLog] = pos;
+            _Log [_curLog].WaitForEndOfFrame = pos;
 
             // FrameEnd
             ammount = (int)(ticks.FrameEnd / ticksUnit);
             _Canvas.FillRect (pos, sy, pos + ammount, ey, new Color (1, 1, 1, 0.5f));
             pos += ammount;
-            _fendLog [_curLog] = pos;
+            _Log [_curLog].FrameEnd = pos;
 
-            for (var i = 0; i < LOG_MAX; i++) {
+            _Log [_curLog].GC = ticks.GCCount != 0;
+
+            for (var i = 0; i < _Log.Length; i++) {
                 int index = _curLog - i;
                 if (index < 0) {
-                    index += LOG_MAX;
+                    index += _Log.Length;
                 }
-                _Canvas.FillRect (0, barHeight + i * 2, _wofLog [index], barHeight + i * 2 + 2, new Color (0.5f, 1, 0.5f, 0.7f));
-                _Canvas.FillRect (_wofLog [index], barHeight + i * 2, _fendLog [index], barHeight + i * 2 + 2, new Color (0.5f, 0.5f, 0.5f, 0.7f));
+                _Canvas.FillRect (
+                    0, barHeight + i * 2, _Log [index].WaitForEndOfFrame, barHeight + i * 2 + 2,
+                    _Log [index].GC ? new Color (1f, 1, 0.5f, 1) : new Color (0.5f, 1, 0.5f, 0.7f));
+                _Canvas.FillRect (
+                    _Log [index].WaitForEndOfFrame, barHeight + i * 2, _Log [index].FrameEnd, barHeight + i * 2 + 2,
+                    _Log [index].GC ? new Color (1f, 0.5f, 0.5f, 1) : new Color (1f, 1f, 1f, 0.5f));
             }
 
             //
             var fps = Time.unscaledDeltaTime != 0 ? 1 / Time.unscaledDeltaTime : 0;
+
+            var restartStopWatch = false;
+            _lastAvgFPSCounter++;
+            if (_lastAvgFPS < 0) {
+                _lastAvgFPS = fps;
+                restartStopWatch = true;
+            } else if (_stopWatch.ElapsedMilliseconds > 1000 && _lastAvgFPSCounter > 10) {
+                _lastAvgFPS = _lastAvgFPSCounter * 1000.0f / _stopWatch.ElapsedMilliseconds;
+                restartStopWatch = true;
+            }
+            if (restartStopWatch == true) {
+                _lastAvgFPSCounter = 0;
+                _stopWatch.Stop ();
+                _stopWatch.Reset ();
+                _stopWatch.Start ();
+            }
+
             _Canvas.SetTextPosition (8, barHeight);
             _Canvas.AddText ("FPS:");
             _Canvas.AddText (fps, 3, 2);
-            _Canvas.AddText ("\nVM:   ");
-            _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoUsedSize () / 1024, 6);
-            _Canvas.AddText ("/");
-            _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoHeapSize () / 1024, 6);
-            _Canvas.AddText ("\nTotal:");
-            _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory () / 1024, 6);
-            _Canvas.AddText ("/");
-            _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalReservedMemory () / 1024, 6);
+            _Canvas.AddText (" AVG.FPS:");
+            _Canvas.AddText (_lastAvgFPS, 3, 2);
+            #if UNITY_5_6_OR_NEWER
+            if (UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong () != 0) {
+                _Canvas.AddText ("\nVM:   ");
+                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong () / 1024, 6);
+                _Canvas.AddText ("/");
+                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoHeapSizeLong () / 1024, 6);
+            }
+            if (UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong () != 0) {
+                _Canvas.AddText ("\nTotal:");
+                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong () / 1024, 6);
+                _Canvas.AddText ("/");
+                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalReservedMemoryLong () / 1024, 6);
+            }
+            #else
+            if (UnityEngine.Profiling.Profiler.GetMonoUsedSize () != 0) {
+                _Canvas.AddText ("\nVM:   ");
+                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoUsedSize () / 1024, 6);
+                _Canvas.AddText ("/");
+                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetMonoHeapSize () / 1024, 6);
+            }
+            if (UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory () != 0) {
+                _Canvas.AddText ("\nTotal:");
+                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory () / 1024, 6);
+                _Canvas.AddText ("/");
+                _Canvas.AddText ((int)UnityEngine.Profiling.Profiler.GetTotalReservedMemory () / 1024, 6);
+            }
+            #endif
         }
 
         #endregion

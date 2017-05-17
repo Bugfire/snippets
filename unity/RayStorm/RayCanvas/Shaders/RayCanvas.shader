@@ -12,7 +12,7 @@
 
 Shader "RayStorm/RayCanvas" {
 Properties {
-	_MainTex ("Particle Texture", 2D) = "white" {}
+	_MainTex ("Texture", 2D) = "white" {}
 }
 
 Category {

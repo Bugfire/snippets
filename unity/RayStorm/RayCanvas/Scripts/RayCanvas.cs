@@ -67,9 +67,9 @@ namespace RayStorm
         #if UNITY_EDITOR
         void OnValidate ()
         {
-            if (UnityEditor.PrefabUtility.GetPrefabType (gameObject) == UnityEditor.PrefabType.Prefab) {
+            if (_ShowMockInEditor == false || UnityEditor.PrefabUtility.GetPrefabType (gameObject) == UnityEditor.PrefabType.Prefab) {
                 _MeshFilter.mesh = null;
-            } else if (_ShowMockInEditor) {
+            } else {
                 Setup ();
                 FillRect (0, 0, _Width, _Height, new Color (1, 0, 1, 0.5f));
                 SetTextPosition (0, 0);
